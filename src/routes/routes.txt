@@ -1,0 +1,65 @@
+import Router, { Response, Request} from 'express';
+import { getRepository, getManager, Any } from 'typeorm';
+import User from '../models/User';
+import Classes from '../models/Classes';
+
+const userRoutes = Router();
+
+userRoutes.post('/', async(req:Request, res:Response) =>{
+    
+    const repoUser = getRepository(User);
+    const repoClass = getRepository(Classes)
+
+    const {
+        name, 
+        avatar, 
+        whatsapp, 
+        bio,
+        subject,
+        cost,
+        usersId 
+    } = req.body;
+
+    try{
+        await getManager().transaction(async transactionalEntityManager =>{
+           const usersId = await transactionalEntityManager
+                .createQueryBuilder()
+                    .insert()
+                    .into(User)
+                    .values({name, avatar, whatsapp, bio})
+                    .execute();
+
+                    console.log(usersId.identifiers[0].id)
+            await transactionalEntityManager
+                .createQueryBuilder()
+                .insert()
+                .into('classes')
+                .values({subject, cost, usersId}) 
+                .execute()       
+        })
+
+        return res.status(201).json()
+
+    }catch(err){
+        console.log('erro : ', err.message);
+        return res.status(400).json({erro:"Erro na craição do User"})
+    }
+
+   
+    
+});
+
+userRoutes.get('/', async(req:Request, res:Response) =>{
+    const repoUser = getRepository(Classes);
+
+    try{
+        const result = await repoUser.find()
+
+        return res.status(200).json(result)
+    }catch(err){
+        console.log("erro : ", err.message)
+        return res.status(400).json({erro:"Na busca de user "})
+    }    
+})
+
+export default userRoutes;
