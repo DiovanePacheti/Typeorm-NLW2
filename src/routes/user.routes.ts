@@ -4,7 +4,7 @@ import User from '../models/User';
 import Classes from '../models/Classes';
 import ClassSchedule from '../models/ClassSchedule';
 import convertHourToMinutes from '../utils/convertHourToMinutes';
-import { validate, validateOrReject } from 'class-validator'
+import { validate } from 'class-validator'
 
 
 const userRoutes = Router();
